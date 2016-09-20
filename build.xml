@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="rest-test-app" default="build">
+    <dirname property="application.basedir" file="/build.xml"/>
+
+
+    <property file="build.properties"/>
+
+    <property name="project.source" value="${basedir}/src"/>
+    <property name="project.test" value="${basedir}/test"/>
+    <property name="project.output.dir" value="${basedir}/out"/>
+    <property name="project.jarname" value="softserv-test"/>
+
+    <!-- JDK definitions -->
+    <property name="project.jdk.home" value="${jdk.home}"/>
+    <property name="project.jdk.classpath" value="jdk.classpath"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="project.source.libs">
+      <pathelement location="${basedir}/lib/*.jar"/>
+  </path>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+      <mkdir dir="${project.output.dir}/production/classes"/>
+      <mkdir dir="${project.output.dir}/test/classes"/>
+  </target>
+
+    <target name="compile">
+        <javac srcdir="${project.source}" destdir="${project.output.dir}/production/classes" includeantruntime="false"/>
+        <javac srcdir="${project.test}" destdir="${project.output.dir}/test/classes" includeantruntime="false">
+            <classpath>
+                <pathelement location="${basedir}/lib/hamcrest-all-1.3.jar"/>
+                <pathelement location="${basedir}/lib/junit-4.12.jar"/>
+                <pathelement location="${project.output.dir}/production/classes"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="testing">
+        <junit printsummary="on" haltonfailure="no">
+            <classpath>
+                <pathelement location="${basedir}/lib/hamcrest-all-1.3.jar"/>
+                <pathelement location="${basedir}/lib/junit-4.12.jar"/>
+                <pathelement location="${project.output.dir}/production/classes"/>
+                <pathelement location="${project.output.dir}/test/classes"/>
+            </classpath>
+            <formatter type="plain" />
+        </junit>
+    </target>
+
+    <target name="prepare-jar">
+        <jar jarfile="${project.output.dir}/${project.jarname}.jar" basedir="${project.output.dir}/production">
+            <manifest>
+                <attribute name="Main-Class" value="my.test.impl.Main"/>
+                <attribute name="Class-Path" value="softserv-test.jar" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clean" description="cleanup all">
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${project.output.dir}"/>
+        <mkdir dir="${project.output.dir}"/>
+    </target>
+  
+    <target name="build" depends="clean, init, compile, testing, prepare-jar" description="build all modules"/>
+  
+
+</project>
